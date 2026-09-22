@@ -2,685 +2,378 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>엄테크와 함께하는 수업</title>
-    
-    <!-- Google Fonts: Noto Sans KR -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Tailwind CSS -->
+    <!-- 폰트 및 아이콘 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Tone.js for soft synth sounds -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['"Noto Sans KR"', 'sans-serif'],
-                    },
-                }
-            }
-        }
-    </script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <style>
-        /* Custom UI Styles & Animations */
         body {
-            background: linear-gradient(135deg, #eef2f3 0%, #8e9eab 100%);
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
             min-height: 100vh;
-            color: #333;
-            -webkit-tap-highlight-color: transparent;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+            overflow-x: hidden;
         }
-
-        .glass-card {
+        .glass-panel {
             background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.5);
         }
-
-        .option-btn {
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        .btn-hover {
+            transition: all 0.2s ease;
         }
-
-        .option-btn:active {
-            transform: scale(0.97);
-            background-color: #f8fafc;
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
-
-        @media (hover: hover) {
-            .option-btn:hover {
-                transform: translateY(-4px);
-                box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.15);
-                border-color: #cbd5e1;
-            }
+        .btn-hover:active {
+            transform: translateY(0);
         }
-
-        .fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Responsive Canvas Container */
-        .canvas-container {
-            width: 100%;
-            max-width: 800px;
-            aspect-ratio: 1 / 1;
-            border-radius: 1.5rem;
-            background: linear-gradient(to bottom, #dbeafe 0%, #f1f5f9 70%, #ecfdf5 100%);
-            box-shadow: inset 0 2px 25px rgba(0,0,0,0.05);
-            margin: 0 auto;
-            position: relative;
-            overflow: hidden;
-        }
-
         #treeCanvas {
             width: 100%;
-            height: 100%;
-            display: block;
+            max-width: 500px;
+            height: auto;
+            background: transparent;
         }
-
-        /* QR Code Hover effect */
-        #qr-container {
-            transition: transform 0.3s ease;
-        }
-        #qr-container:hover {
-            transform: scale(1.05);
-        }
+        .screen { display: none; }
+        .screen.active { display: block; }
     </style>
 </head>
-<body class="flex items-center justify-center p-4">
+<body class="p-4">
 
-    <!-- 0. Role Selection Screen -->
-    <div id="screen-role" class="screen w-full max-w-md fade-in">
-        <div class="glass-card rounded-3xl p-8 md:p-10 text-center">
-            <p class="text-blue-600 font-bold mb-2">엄테크와 함께하는 수업</p>
-            <h1 class="text-3xl font-black text-gray-800 mb-8">우리 반 나무 키우기 🌱</h1>
-            
+    <!-- 0. 역할 선택 화면 -->
+    <div id="screen-role" class="screen active w-full max-w-md">
+        <div class="glass-panel p-8 text-center">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">엄테크와 함께하는 수업</h1>
+            <p class="text-gray-500 mb-8">우리 반 마음 나무 키우기 🌳</p>
             <div class="space-y-4">
-                <button onclick="selectRole('student')" class="option-btn w-full bg-white border-2 border-blue-100 text-blue-600 rounded-2xl p-4 text-lg font-bold flex items-center justify-center gap-3">
-                    <span class="text-2xl">👨‍🎓</span> 학생으로 입장하기
+                <button onclick="selectRole('student')" class="btn-hover w-full py-4 bg-emerald-500 text-white rounded-xl text-xl font-bold">
+                    👨‍🎓 학생으로 입장
                 </button>
-                <button onclick="selectRole('teacher')" class="option-btn w-full bg-blue-600 text-white rounded-2xl p-4 text-lg font-bold flex items-center justify-center gap-3 shadow-lg shadow-blue-200">
-                    <span class="text-2xl">👨‍🏫</span> 선생님 대시보드 열기
+                <button onclick="selectRole('teacher')" class="btn-hover w-full py-4 bg-blue-500 text-white rounded-xl text-xl font-bold">
+                    👨‍🏫 선생님으로 입장
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- 1. Student: Condition -->
-    <div id="screen-condition" class="screen w-full max-w-md hidden">
-        <div class="glass-card rounded-3xl p-6 md:p-8">
-            <p class="text-center text-sm font-bold text-gray-400 mb-2">STEP 1. 컨디션 (꽃)</p>
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">나의 현재 컨디션은?</h2>
+    <!-- 1. 학생: 컨디션 입력 -->
+    <div id="screen-condition" class="screen w-full max-w-md">
+        <div class="glass-panel p-8">
+            <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">🌸 나의 현재 컨디션은?</h2>
+            <div class="space-y-3">
+                <button onclick="selectCondition(50)" class="btn-hover w-full p-4 bg-white border-2 border-pink-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">🤩</span><span class="font-bold text-pink-500 w-12">50점</span><span class="text-gray-700">최고의 컨디션!</span>
+                </button>
+                <button onclick="selectCondition(40)" class="btn-hover w-full p-4 bg-white border-2 border-pink-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">😄</span><span class="font-bold text-pink-500 w-12">40점</span><span class="text-gray-700">기분 좋아요!</span>
+                </button>
+                <button onclick="selectCondition(30)" class="btn-hover w-full p-4 bg-white border-2 border-pink-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">🙂</span><span class="font-bold text-pink-500 w-12">30점</span><span class="text-gray-700">보통이에요.</span>
+                </button>
+                <button onclick="selectCondition(20)" class="btn-hover w-full p-4 bg-white border-2 border-pink-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">🥱</span><span class="font-bold text-pink-500 w-12">20점</span><span class="text-gray-700">조금 피곤해요.</span>
+                </button>
+                <button onclick="selectCondition(10)" class="btn-hover w-full p-4 bg-white border-2 border-pink-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">😵</span><span class="font-bold text-pink-500 w-12">10점</span><span class="text-gray-700">완전 지쳤어요.</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. 학생: 다짐 입력 -->
+    <div id="screen-resolution" class="screen w-full max-w-md">
+        <div class="glass-panel p-8">
+            <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">🌿 오늘 나의 다짐은?</h2>
+            <div class="space-y-3">
+                <button onclick="submitData(50)" class="btn-hover w-full p-4 bg-white border-2 border-emerald-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">🚀</span><span class="font-bold text-emerald-500 w-12">50점</span><span class="text-gray-700">한계 돌파!</span>
+                </button>
+                <button onclick="submitData(40)" class="btn-hover w-full p-4 bg-white border-2 border-emerald-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">🔥</span><span class="font-bold text-emerald-500 w-12">40점</span><span class="text-gray-700">열정 가득!</span>
+                </button>
+                <button onclick="submitData(30)" class="btn-hover w-full p-4 bg-white border-2 border-emerald-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">🌿</span><span class="font-bold text-emerald-500 w-12">30점</span><span class="text-gray-700">최선을 다할게요.</span>
+                </button>
+                <button onclick="submitData(20)" class="btn-hover w-full p-4 bg-white border-2 border-emerald-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">🌱</span><span class="font-bold text-emerald-500 w-12">20점</span><span class="text-gray-700">천천히 할게요.</span>
+                </button>
+                <button onclick="submitData(10)" class="btn-hover w-full p-4 bg-white border-2 border-emerald-100 rounded-xl text-left flex items-center">
+                    <span class="text-2xl mr-3">💧</span><span class="font-bold text-emerald-500 w-12">10점</span><span class="text-gray-700">무리하지 않을래요.</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. 학생: 완료 화면 -->
+    <div id="screen-done" class="screen w-full max-w-md">
+        <div class="glass-panel p-8 text-center">
+            <div class="text-5xl mb-4">✨</div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">제출 완료!</h2>
+            <p class="text-gray-600 mb-8">앞 화면의 나무가 자라나는 걸 확인하세요!</p>
+            <button onclick="location.reload()" class="btn-hover w-full py-3 bg-gray-200 text-gray-700 rounded-xl font-bold">처음으로</button>
+        </div>
+    </div>
+
+    <!-- 4. 선생님 화면 -->
+    <div id="screen-teacher" class="screen w-full max-w-5xl">
+        <div class="flex flex-col md:flex-row gap-6 items-start">
             
-            <div class="space-y-3 flex flex-col">
-                <button onclick="selectCondition(50)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-pink-500 w-12 shrink-0">50점</span> 🤩 최고의 컨디션! 하늘을 날 듯해요!
-                </button>
-                <button onclick="selectCondition(40)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-pink-500 w-12 shrink-0">40점</span> 😄 기분 좋아요! 활기차게 시작해요!
-                </button>
-                <button onclick="selectCondition(30)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-pink-500 w-12 shrink-0">30점</span> 🙂 보통이에요, 오늘 하루도 무사히!
-                </button>
-                <button onclick="selectCondition(20)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-pink-500 w-12 shrink-0">20점</span> 🥱 조금 피곤해요, 으쌰으쌰 할게요!
-                </button>
-                <button onclick="selectCondition(10)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-pink-500 w-12 shrink-0">10점</span> 😵 완전 지쳤어요... 충전이 필요해!
-                </button>
+            <!-- 왼쪽: 나무 캔버스 -->
+            <div class="glass-panel p-4 flex-grow w-full relative">
+                <div class="absolute top-4 left-4 text-left">
+                    <h1 class="text-2xl font-bold text-gray-800">엄테크와 함께하는 수업</h1>
+                    <p class="text-sm text-gray-500">우리 반 실시간 나무</p>
+                </div>
+                
+                <!-- 높이 척도 (Scale) -->
+                <div class="absolute left-4 top-20 bottom-12 w-16 border-r-2 border-dashed border-gray-300 flex flex-col justify-between text-xs text-gray-400 font-bold py-4">
+                    <div>Lv.5 (완성)</div>
+                    <div>Lv.4 (큰 나무)</div>
+                    <div>Lv.3 (중간)</div>
+                    <div>Lv.2 (어린 나무)</div>
+                    <div>Lv.1 (새싹)</div>
+                </div>
+
+                <div class="flex justify-center ml-16 mt-16">
+                    <canvas id="treeCanvas" width="600" height="600"></canvas>
+                </div>
             </div>
-        </div>
-    </div>
 
-    <!-- 2. Student: Resolution -->
-    <div id="screen-resolution" class="screen w-full max-w-md hidden">
-        <div class="glass-card rounded-3xl p-6 md:p-8">
-            <p class="text-center text-sm font-bold text-gray-400 mb-2">STEP 2. 다짐 지수 (나무 크기)</p>
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">오늘 나의 다짐 지수는?</h2>
-            
-            <div class="space-y-3 flex flex-col">
-                <button onclick="submitData(50)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-green-500 w-12 shrink-0">50점</span> 🚀 한계 돌파! 반짝반짝 빛나는 하루!
-                </button>
-                <button onclick="submitData(40)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-green-500 w-12 shrink-0">40점</span> 🔥 열정 가득! 뭐든 해낼 수 있어요!
-                </button>
-                <button onclick="submitData(30)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-green-500 w-12 shrink-0">30점</span> 🌿 주어진 일에 최선을 다할게요!
-                </button>
-                <button onclick="submitData(20)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-green-500 w-12 shrink-0">20점</span> 🌱 천천히 내 페이스대로 할게요.
-                </button>
-                <button onclick="submitData(10)" class="option-btn w-full bg-white border border-gray-100 rounded-xl p-4 text-left font-medium text-gray-700 md:text-lg flex items-center">
-                    <span class="font-bold text-green-500 w-12 shrink-0">10점</span> 💧 오늘은 무리하지 않고 쉴래요.
-                </button>
-            </div>
-        </div>
-    </div>
+            <!-- 오른쪽: 대시보드 -->
+            <div class="glass-panel p-6 w-full md:w-80 flex-shrink-0">
+                <div class="mb-6">
+                    <h3 class="text-lg font-bold text-gray-700 mb-2">스마트폰으로 참여하기</h3>
+                    <div id="qrcode" class="bg-white p-2 rounded-lg inline-block border border-gray-200"></div>
+                </div>
 
-    <!-- 3. Student: Done -->
-    <div id="screen-done" class="screen w-full max-w-md hidden text-center">
-        <div class="glass-card rounded-3xl p-10">
-            <div class="text-6xl mb-4">✨</div>
-            <h2 class="text-3xl font-black text-gray-800 mb-2">제출 완료!</h2>
-            <p class="text-gray-500 mb-8 font-medium">선생님 화면에서<br>성장한 학급 나무를 확인하세요.</p>
-            <button onclick="resetStudent()" class="option-btn w-full bg-gray-800 text-white rounded-xl p-4 font-bold text-lg">
-                처음으로 돌아가기
-            </button>
-        </div>
-    </div>
-
-    <!-- 4. Teacher: Dashboard -->
-    <div id="screen-teacher" class="screen w-full max-w-5xl hidden">
-        <div class="glass-card rounded-3xl p-6 md:p-8">
-            <!-- Header Section with Info and QR Code -->
-            <div class="flex flex-col md:flex-row justify-between items-start mb-6 gap-6">
-                <div class="flex-1">
-                    <p class="text-blue-600 font-bold mb-1">엄테크와 함께하는 수업</p>
-                    <h1 class="text-3xl font-black text-gray-800">오늘의 학급 나무 🌳</h1>
-                    <p class="text-gray-500 font-medium mt-2">학생들이 데이터를 제출하면 실시간으로 동기화되어 나무가 자라납니다.</p>
-                    
-                    <div class="flex gap-2 mt-4">
-                        <button onclick="resetClassData()" class="bg-red-50 text-red-500 px-4 py-2 rounded-xl font-bold hover:bg-red-100 transition shadow-sm text-sm">데이터 초기화</button>
-                        <button onclick="location.reload()" class="bg-white border border-gray-200 text-gray-600 px-4 py-2 rounded-xl font-bold hover:bg-gray-50 transition shadow-sm text-sm">나가기</button>
+                <div class="space-y-4 mb-8">
+                    <div class="bg-blue-50 p-4 rounded-xl">
+                        <p class="text-sm text-blue-600 font-bold">참여 인원</p>
+                        <p class="text-3xl font-black text-blue-800"><span id="studentCount">0</span>명</p>
+                    </div>
+                    <div class="bg-pink-50 p-4 rounded-xl">
+                        <p class="text-sm text-pink-600 font-bold">학급 컨디션 (꽃)</p>
+                        <p class="text-2xl font-black text-pink-800"><span id="avgCond">0</span>점</p>
+                    </div>
+                    <div class="bg-emerald-50 p-4 rounded-xl">
+                        <p class="text-sm text-emerald-600 font-bold">학급 다짐 (크기)</p>
+                        <p class="text-2xl font-black text-emerald-800"><span id="avgRes">0</span>점</p>
                     </div>
                 </div>
-                
-                <!-- QR Code Box -->
-                <div id="qr-container" class="bg-white rounded-2xl p-3 border border-gray-200 shadow-md flex flex-col items-center shrink-0">
-                    <p class="text-xs font-bold text-gray-500 mb-2">스마트폰으로 참여하기</p>
-                    <img id="qr-code-img" src="" alt="QR Code" class="w-32 h-32 md:w-40 md:h-40 rounded-lg">
-                </div>
-            </div>
 
-            <!-- Stats Bar -->
-            <div class="grid grid-cols-3 gap-3 md:gap-4 mb-6">
-                <div class="bg-white/60 rounded-2xl p-3 md:p-4 text-center border border-white shadow-sm">
-                    <p class="text-xs md:text-sm text-gray-500 font-bold mb-1">참여 인원</p>
-                    <p class="text-2xl md:text-3xl font-black text-blue-600"><span id="studentCount">0</span><span class="text-sm md:text-lg text-gray-400 font-medium ml-1">명</span></p>
-                </div>
-                <div class="bg-white/60 rounded-2xl p-3 md:p-4 text-center border border-white shadow-sm">
-                    <p class="text-xs md:text-sm text-gray-500 font-bold mb-1">평균 컨디션 (꽃)</p>
-                    <p class="text-2xl md:text-3xl font-black text-pink-500"><span id="avgCond">0</span><span class="text-sm md:text-lg text-gray-400 font-medium ml-1">점</span></p>
-                </div>
-                <div class="bg-white/60 rounded-2xl p-3 md:p-4 text-center border border-white shadow-sm">
-                    <p class="text-xs md:text-sm text-gray-500 font-bold mb-1">평균 다짐 (크기)</p>
-                    <p class="text-2xl md:text-3xl font-black text-green-600"><span id="avgRes">0</span><span class="text-sm md:text-lg text-gray-400 font-medium ml-1">점</span></p>
-                </div>
-            </div>
-
-            <!-- Responsive Canvas Container -->
-            <div class="canvas-container relative flex justify-center bg-white/40 p-2 border border-white">
-                <!-- Inner resolution is fixed 800x800, CSS scales it down responsively -->
-                <canvas id="treeCanvas" width="800" height="800"></canvas>
-                <!-- Loading overlay -->
-                <div id="loadingOverlay" class="absolute inset-0 flex items-center justify-center bg-white/80 rounded-xl hidden">
-                    <p class="text-xl font-bold text-gray-600 animate-pulse">데이터 동기화 중...</p>
-                </div>
+                <button onclick="resetData()" class="btn-hover w-full py-3 bg-red-100 text-red-600 rounded-xl font-bold mb-3">초기화</button>
+                <button onclick="location.reload()" class="btn-hover w-full py-3 bg-gray-100 text-gray-600 rounded-xl font-bold">나가기</button>
             </div>
         </div>
     </div>
 
+    <!-- Firebase SDK 연동 (선생님의 이미지 정보 반영) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, deleteDoc, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, onValue, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-        // Firebase Configuration & Initialization
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'eomtech-class-tree';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
-            // Mock config to prevent crashes if run locally without environment
-            apiKey: "mock-api-key", projectId: "mock-project-id" 
+        // 선생님의 Firebase 설정 정보
+        const firebaseConfig = {
+            apiKey: "AIzaSyALcYu_8OWhlQZ5ARb7oIUu3hxwGlpJP0E",
+            authDomain: "class-tree-45aba.firebaseapp.com",
+            projectId: "class-tree-45aba",
+            storageBucket: "class-tree-45aba.firebasestorage.app",
+            messagingSenderId: "136336920281",
+            appId: "1:136336920281:web:26c89409abab8b108738c8",
+            measurementId: "G-KRTHEDVW93"
         };
-        
+
         const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
         const auth = getAuth(app);
-        const db = getFirestore(app);
         
-        let currentUser = null;
-        let unsubscribe = null;
-        let isInitialLoad = true;
-        let currentStudentCondition = 0;
+        let dbRef = ref(db, 'class_data');
+        window.tempCondition = 0;
 
-        // Ensure Firebase Auth before accessing Firestore (Mandatory Rule)
-        async function ensureAuth() {
-            if (currentUser) return;
-            try {
-                if (typeof __initial_auth_token !== 'undefined') {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                currentUser = auth.currentUser;
-            } catch (error) {
-                console.error("Auth Error:", error);
-                alert("인증에 실패했습니다. 관리자에게 문의하세요.");
-            }
-        }
+        signInAnonymously(auth).catch((error) => {
+            console.error("인증 실패: Realtime DB와 Auth 설정을 확인해주세요.", error);
+            alert("파이어베이스 설정(Authentication 익명 로그인)을 켜주세요!");
+        });
 
-        // Collection Ref: strict path logic required
-        function getSubmissionsRef() {
-            return collection(db, 'artifacts', appId, 'public', 'data', 'submissions');
-        }
-
-        // Make functions globally available for inline HTML onclick handlers
-        window.selectRole = async function(role) {
-            initAudio().then(() => playSound('click'));
-            await ensureAuth();
-            
-            if (role === 'student') {
-                showScreen('screen-condition');
+        window.selectRole = function(role) {
+            playTone('click');
+            if(role === 'student') {
+                document.getElementById('screen-role').classList.remove('active');
+                document.getElementById('screen-condition').classList.add('active');
             } else {
-                showScreen('screen-teacher');
-                generateQRCode();
-                startRealtimeListener();
+                document.getElementById('screen-role').classList.remove('active');
+                document.getElementById('screen-teacher').classList.add('active');
+                generateQR();
+                startListening();
             }
-        }
+        };
 
         window.selectCondition = function(score) {
-            playSound('click');
-            currentStudentCondition = score;
-            showScreen('screen-resolution');
-        }
+            playTone('click');
+            window.tempCondition = score;
+            document.getElementById('screen-condition').classList.remove('active');
+            document.getElementById('screen-resolution').classList.add('active');
+        };
 
-        window.submitData = async function(resolutionScore) {
-            playSound('success');
-            await ensureAuth();
-            
-            try {
-                // Add document to Firestore
-                await addDoc(getSubmissionsRef(), {
-                    condition: currentStudentCondition,
-                    resolution: resolutionScore,
-                    timestamp: new Date().toISOString()
+        window.submitData = function(resScore) {
+            playTone('success');
+            push(dbRef, { condition: window.tempCondition, resolution: resScore })
+                .then(() => {
+                    document.getElementById('screen-resolution').classList.remove('active');
+                    document.getElementById('screen-done').classList.add('active');
                 });
-                showScreen('screen-done');
-            } catch (error) {
-                console.error("Error submitting data:", error);
-                alert("데이터 제출 중 오류가 발생했습니다.");
+        };
+
+        window.resetData = function() {
+            if(confirm("정말 모든 데이터를 지우시겠습니까?")) {
+                set(dbRef, null);
             }
-        }
+        };
 
-        window.resetStudent = function() {
-            playSound('click');
-            currentStudentCondition = 0;
-            showScreen('screen-condition');
-        }
-
-        // Delete all submissions (reset)
-        window.resetClassData = async function() {
-            const confirmed = window.confirm("모든 학생의 데이터가 완전히 삭제됩니다. 초기화하시겠습니까?");
-            if(!confirmed) return;
-            
-            playSound('click');
-            document.getElementById('loadingOverlay').classList.remove('hidden');
-            
-            try {
-                const snapshot = await getDocs(getSubmissionsRef());
-                const deletePromises = [];
-                snapshot.forEach(d => {
-                    deletePromises.push(deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'submissions', d.id)));
-                });
-                await Promise.all(deletePromises);
-            } catch(e) {
-                console.error("Reset error:", e);
-            } finally {
-                document.getElementById('loadingOverlay').classList.add('hidden');
-            }
-        }
-
-        // --- Realtime Listener ---
-        function startRealtimeListener() {
-            if (!currentUser) return;
-            
-            if (unsubscribe) unsubscribe();
-            document.getElementById('loadingOverlay').classList.remove('hidden');
-
-            unsubscribe = onSnapshot(getSubmissionsRef(), (snapshot) => {
-                let classData = [];
-                snapshot.forEach(doc => classData.push(doc.data()));
+        function startListening() {
+            onValue(dbRef, (snapshot) => {
+                const data = snapshot.val();
+                let count = 0, sumCond = 0, sumRes = 0;
                 
-                updateDashboardUI(classData);
-                document.getElementById('loadingOverlay').classList.add('hidden');
-
-                if (!isInitialLoad) {
-                    playSound('grow');
+                if (data) {
+                    const entries = Object.values(data);
+                    count = entries.length;
+                    entries.forEach(e => {
+                        sumCond += e.condition;
+                        sumRes += e.resolution;
+                    });
+                    playTone('grow');
                 }
-                isInitialLoad = false;
                 
-            }, (error) => {
-                console.error("Firestore onSnapshot error:", error);
-                document.getElementById('loadingOverlay').classList.add('hidden');
+                const avgCond = count > 0 ? Math.round(sumCond / count) : 0;
+                const avgRes = count > 0 ? Math.round(sumRes / count) : 0;
+
+                document.getElementById('studentCount').innerText = count;
+                document.getElementById('avgCond').innerText = avgCond;
+                document.getElementById('avgRes').innerText = avgRes;
+                
+                drawFractalTree(avgCond, avgRes);
             });
         }
 
-        // --- Audio Context & Synth ---
-        let synth = null;
-        let isAudioInitialized = false;
+        // --- 사운드 ---
+        const synth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 1 }
+        }).toDestination();
+        synth.volume.value = -10;
 
-        async function initAudio() {
-            if (isAudioInitialized) return;
-            await Tone.start();
-            synth = new Tone.PolySynth(Tone.FMSynth, {
-                harmonicity: 3,
-                modulationIndex: 10,
-                detune: 0,
-                oscillator: { type: "sine" },
-                envelope: { attack: 0.05, decay: 0.2, sustain: 0.2, release: 1.5 },
-                modulation: { type: "square" },
-                modulationEnvelope: { attack: 0.5, decay: 0.01, sustain: 1, release: 0.5 }
-            }).toDestination();
-            synth.volume.value = -15;
-            isAudioInitialized = true;
-        }
-
-        function playSound(type) {
-            if (!synth) return;
-            const now = Tone.now();
-            if (type === 'click') {
-                synth.triggerAttackRelease("G4", "16n", now);
-            } else if (type === 'success') {
-                synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "4n", now);
-            } else if (type === 'grow') {
-                synth.triggerAttackRelease("C4", "16n", now);
-                synth.triggerAttackRelease("E4", "16n", now + 0.1);
-                synth.triggerAttackRelease("G4", "16n", now + 0.2);
-                synth.triggerAttackRelease("B4", "8n", now + 0.3);
-                synth.triggerAttackRelease("C5", "2n", now + 0.45);
+        window.playTone = function(type) {
+            Tone.start();
+            if(type === 'click') synth.triggerAttackRelease("C5", "8n");
+            else if(type === 'success') {
+                synth.triggerAttackRelease(["C5", "E5", "G5"], "4n");
             }
-        }
+            else if(type === 'grow') {
+                synth.triggerAttackRelease(["E4", "G4", "C5"], "2n");
+            }
+        };
 
-        // --- Helper UI Functions ---
-        function showScreen(id) {
-            document.querySelectorAll('.screen').forEach(s => {
-                s.classList.add('hidden');
-                s.classList.remove('fade-in');
+        // --- QR 생성 ---
+        function generateQR() {
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = "";
+            new QRCode(qrContainer, {
+                text: window.location.href,
+                width: 128, height: 128,
+                colorDark: "#1f2937", colorLight: "#ffffff"
             });
-            const target = document.getElementById(id);
-            target.classList.remove('hidden');
-            target.classList.add('fade-in');
         }
 
-        function generateQRCode() {
-            const currentUrl = window.location.href;
-            const qrImg = document.getElementById('qr-code-img');
-            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=10&data=${encodeURIComponent(currentUrl)}`;
-        }
-
-        // --- Dashboard Update & Rendering ---
-        
-        let seed = 1;
-        function random() {
-            seed = (seed * 9301 + 49297) % 233280;
-            return seed / 233280;
-        }
-        function randomRange(min, max) {
-            return min + random() * (max - min);
-        }
-
-        function updateDashboardUI(classData) {
-            let count = classData.length;
-            let avgCond = 0;
-            let avgRes = 0;
-
-            if (count > 0) {
-                let sumCond = classData.reduce((acc, curr) => acc + curr.condition, 0);
-                let sumRes = classData.reduce((acc, curr) => acc + curr.resolution, 0);
-                avgCond = Math.round(sumCond / count);
-                avgRes = Math.round(sumRes / count);
-            }
-
-            // Animate number changes subtly
-            document.getElementById('studentCount').innerText = count;
-            document.getElementById('avgCond').innerText = avgCond;
-            document.getElementById('avgRes').innerText = avgRes;
-
-            renderCanvas(avgCond, avgRes, count);
-        }
-
-        function renderCanvas(condScore, resScore, count) {
+        // --- 캔버스 프랙탈 나무 렌더링 ---
+        function drawFractalTree(condScore, resScore) {
             const canvas = document.getElementById('treeCanvas');
             const ctx = canvas.getContext('2d');
-            const w = canvas.width;  // Fixed 800
-            const h = canvas.height; // Fixed 800
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            ctx.clearRect(0, 0, w, h);
-            
-            // Seed logic: fixed tree structure unless count changes
-            seed = 42 + count; 
-
-            // Center tree slightly right to leave room for the ruler
-            const rootX = w / 2 + 80; 
-            const rootY = h - 60;     
-
-            drawRuler(ctx, w, rootY);
-
-            if (condScore === 0 && resScore === 0) {
+            if(condScore === 0 && resScore === 0) {
                 ctx.fillStyle = '#94a3b8';
-                ctx.font = '700 28px "Noto Sans KR"';
+                ctx.font = '20px Noto Sans KR';
                 ctx.textAlign = 'center';
-                ctx.fillText("첫 번째 학생의 입력을 기다립니다!", rootX, rootY - 350);
+                ctx.fillText('학생들의 참여를 기다리는 중입니다...', canvas.width/2, canvas.height/2);
                 return;
             }
 
-            // Map Resolution Score to Fractal Parameters
-            let maxDepth = 0, baseLength = 0, branchWidth = 0;
-            if (resScore >= 45)      { maxDepth = 10; baseLength = 170; branchWidth = 18; }
-            else if (resScore >= 40) { maxDepth = 9;  baseLength = 145; branchWidth = 15; }
-            else if (resScore >= 30) { maxDepth = 7;  baseLength = 110; branchWidth = 12; }
-            else if (resScore >= 20) { maxDepth = 5;  baseLength = 70;  branchWidth = 9; }
-            else                     { maxDepth = 4;  baseLength = 35;  branchWidth = 6; }
-
-            ctx.save();
-            // Tree shadow
-            ctx.fillStyle = 'rgba(0,0,0,0.08)';
-            ctx.beginPath();
-            ctx.ellipse(rootX, rootY, branchWidth * 4, branchWidth * 1.5, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Draw Tree
-            drawFractalBranch(ctx, rootX, rootY, baseLength, 0, branchWidth, maxDepth, maxDepth, condScore);
-            ctx.restore();
-        }
-
-        // Recursive Fractal Logic
-        function drawFractalBranch(ctx, startX, startY, len, angle, branchWidth, depth, maxDepth, condScore) {
-            ctx.beginPath();
-            ctx.save();
+            // 다짐 지수(크기)에 따른 스케일
+            let scale = resScore / 50; 
+            if (scale < 0.2) scale = 0.2; // 최소 크기 보장 (새싹)
             
-            // Bark gradient coloring based on depth
-            const colorRatio = depth / maxDepth;
-            ctx.strokeStyle = `rgb(${70 + (1-colorRatio)*20}, ${50 + (1-colorRatio)*30}, ${40})`; 
-            ctx.lineWidth = branchWidth;
-            ctx.lineCap = 'round';
-            ctx.lineJoin = 'round';
-            
-            ctx.translate(startX, startY);
-            ctx.rotate(angle * Math.PI / 180);
-            
-            ctx.moveTo(0, 0);
-            const bend = (maxDepth - depth) > 2 ? randomRange(-3, 3) : 0;
-            ctx.quadraticCurveTo(bend, -len / 2, 0, -len);
-            ctx.stroke();
+            const startX = canvas.width / 2;
+            const startY = canvas.height - 20;
+            const initialLength = 120 * scale; 
+            const maxDepth = Math.max(3, Math.floor((resScore / 10) + 4)); 
 
-            // Endpoint features (Leaves and Flowers)
-            if (depth === 0) {
-                drawRealisticLeaf(ctx, 0, -len);
-                if (shouldDrawFlower(condScore)) {
-                    drawRealisticFlower(ctx, 0, -len, condScore);
+            // 컨디션 지수(꽃)에 따른 피어날 확률 설정
+            const flowerProb = condScore >= 20 ? (condScore / 50) : 0; 
+
+            function drawBranch(x, y, len, angle, depth) {
+                if (depth === 0) {
+                    drawLeaf(x, y, len);
+                    if (Math.random() < flowerProb) {
+                        drawFlower(x, y, condScore);
+                    }
+                    return;
                 }
-                ctx.restore();
-                return;
-            }
 
-            // Occasional inner leaves
-            if (depth < maxDepth - 2 && random() > 0.6) {
-               drawRealisticLeaf(ctx, 0, -len * 0.5);
-            }
-
-            // Next branches variables
-            let newLen = len * randomRange(0.72, 0.82);
-            let newWidth = branchWidth * 0.7;
-            let rightAngle = randomRange(15, 30);
-            let leftAngle = randomRange(-30, -15);
-
-            // Left and Right splits
-            drawFractalBranch(ctx, 0, -len, newLen, rightAngle, newWidth, depth - 1, maxDepth, condScore);
-            drawFractalBranch(ctx, 0, -len, newLen, leftAngle, newWidth, depth - 1, maxDepth, condScore);
-            
-            // Rare center third branch for density
-            if (maxDepth > 6 && depth > 3 && random() > 0.85) {
-                drawFractalBranch(ctx, 0, -len, newLen * 0.8, randomRange(-10, 10), newWidth * 0.8, depth - 1, maxDepth, condScore);
-            }
-
-            ctx.restore();
-        }
-
-        // Leaf Drawing (Bezier Curve)
-        function drawRealisticLeaf(ctx, x, y) {
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(randomRange(0, Math.PI * 2));
-            
-            const g1 = Math.floor(randomRange(140, 180));
-            const g2 = Math.floor(randomRange(100, 140));
-            
-            let grad = ctx.createLinearGradient(0, 0, 0, -30);
-            grad.addColorStop(0, `rgb(30, ${g2}, 40)`);
-            grad.addColorStop(1, `rgb(60, ${g1}, 70)`);
-            
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.quadraticCurveTo(15, -12, 0, -30); // scale slightly bigger for 800px canvas
-            ctx.quadraticCurveTo(-15, -12, 0, 0);
-            ctx.fill();
-            
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-            ctx.lineWidth = 1.5;
-            ctx.beginPath();
-            ctx.moveTo(0,0);
-            ctx.lineTo(0, -25);
-            ctx.stroke();
-
-            ctx.restore();
-        }
-
-        // Flower Probability
-        function shouldDrawFlower(condScore) {
-            if (condScore >= 40) return random() > 0.3;      
-            else if (condScore >= 30) return random() > 0.6; 
-            else if (condScore >= 20) return random() > 0.8; 
-            else return random() > 0.95;                     
-        }
-
-        // Flower Drawing (Bezier Curves & Arcs)
-        function drawRealisticFlower(ctx, x, y, condScore) {
-            let scale = condScore >= 40 ? 1.6 : (condScore >= 30 ? 1.2 : 0.8);
-            const isBud = condScore < 20;
-            if (isBud) scale = 0.6;
-
-            ctx.save();
-            ctx.translate(x, y);
-            ctx.rotate(randomRange(0, Math.PI * 2));
-            
-            if (isBud) {
-                // Bud
-                ctx.fillStyle = '#f48fb1'; 
                 ctx.beginPath();
-                ctx.ellipse(0, -6, 5 * scale, 10 * scale, 0, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.moveTo(x, y);
+                const endX = x + len * Math.sin(angle);
+                const endY = y - len * Math.cos(angle);
+                ctx.lineTo(endX, endY);
                 
-                // Sepal
-                ctx.fillStyle = '#4caf50';
+                ctx.strokeStyle = '#5d4037'; 
+                ctx.lineWidth = depth * 1.5;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+
+                const angleOffset = 0.4 + (Math.random() * 0.2); // 약간의 불규칙성
+                drawBranch(endX, endY, len * 0.75, angle - angleOffset, depth - 1);
+                drawBranch(endX, endY, len * 0.75, angle + angleOffset, depth - 1);
+            }
+
+            function drawLeaf(x, y, size) {
                 ctx.beginPath();
-                ctx.moveTo(-5*scale, -2);
-                ctx.lineTo(5*scale, -2);
-                ctx.lineTo(0, 3);
+                ctx.ellipse(x, y, size * 0.3, size * 0.6, Math.random() * Math.PI, 0, 2 * Math.PI);
+                ctx.fillStyle = `rgba(76, 175, 80, 0.8)`;
                 ctx.fill();
-            } else {
-                // Bloom
-                const petals = condScore >= 40 ? 6 : 5;
-                const petalColor = condScore >= 40 ? 'rgba(255, 99, 132, 0.9)' : 'rgba(244, 143, 177, 0.9)';
-                
-                ctx.fillStyle = petalColor;
-                for(let i = 0; i < petals; i++) {
-                    ctx.rotate((Math.PI * 2) / petals);
+            }
+
+            function drawFlower(x, y, condition) {
+                let size = condition >= 40 ? 8 : (condition >= 30 ? 6 : 4);
+                let color = condition >= 40 ? '#ec4899' : '#f472b6'; 
+
+                for (let i = 0; i < 5; i++) {
                     ctx.beginPath();
-                    ctx.moveTo(0, 0);
-                    ctx.bezierCurveTo(10*scale, -10*scale, 10*scale, -22*scale, 0, -25*scale);
-                    ctx.bezierCurveTo(-10*scale, -22*scale, -10*scale, -10*scale, 0, 0);
+                    let ang = (i * 2 * Math.PI) / 5;
+                    let fx = x + Math.cos(ang) * size;
+                    let fy = y + Math.sin(ang) * size;
+                    ctx.arc(fx, fy, size, 0, Math.PI * 2);
+                    ctx.fillStyle = color;
                     ctx.fill();
                 }
-                
-                // Stamen
-                ctx.fillStyle = '#FFEB3B';
                 ctx.beginPath();
-                ctx.arc(0, 0, 5 * scale, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#F57F17';
-                ctx.beginPath();
-                ctx.arc(0, 0, 2.5 * scale, 0, Math.PI * 2);
+                ctx.arc(x, y, size * 0.8, 0, Math.PI * 2);
+                ctx.fillStyle = '#fef08a'; // 수술
                 ctx.fill();
             }
-            ctx.restore();
-        }
 
-        // Left Ruler (Measuring Scale)
-        function drawRuler(ctx, canvasWidth, rootY) {
-            const levels = [
-                { label: 'Lv.5 완전한 거목 (45점~)', y: rootY - 700 },
-                { label: 'Lv.4 튼튼한 큰 나무 (40점)', y: rootY - 550 },
-                { label: 'Lv.3 중간 나무 (30점)', y: rootY - 400 },
-                { label: 'Lv.2 어린 묘목 (20점)', y: rootY - 250 },
-                { label: 'Lv.1 작은 새싹 (10점)', y: rootY - 100 }
-            ];
-
-            ctx.save();
-            ctx.strokeStyle = 'rgba(100, 116, 139, 0.4)'; 
-            ctx.fillStyle = '#475569';
-            ctx.font = '700 18px "Noto Sans KR"';
-            ctx.textAlign = 'left';
-            ctx.textBaseline = 'middle';
-
-            // Vertical axis
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            ctx.moveTo(220, rootY);
-            ctx.lineTo(220, rootY - 750);
-            ctx.stroke();
-
-            // Grid lines and labels
-            levels.forEach(lvl => {
-                ctx.fillText(lvl.label, 30, lvl.y);
-                
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.moveTo(210, lvl.y);
-                ctx.lineTo(220, lvl.y);
-                ctx.stroke();
-
-                ctx.lineWidth = 1.5;
-                ctx.beginPath();
-                ctx.setLineDash([8, 8]);
-                ctx.moveTo(220, lvl.y);
-                ctx.lineTo(canvasWidth - 40, lvl.y);
-                ctx.stroke();
-                ctx.setLineDash([]); 
-            });
-            ctx.restore();
+            drawBranch(startX, startY, initialLength, 0, maxDepth);
         }
     </script>
 </body>
